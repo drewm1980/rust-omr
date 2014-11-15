@@ -7,7 +7,7 @@ authors = ["Andrew Wagner <drewm1980@gmail.com>"]
 [dependencies.png]
 git="https://github.com/servo/rust-png"
 
-[dependencies.stb-image]
+[dependencies.stb_image]
 git="https://github.com/servo/rust-stb-image"
 
 [[bin]]
