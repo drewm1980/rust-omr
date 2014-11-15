@@ -1,0 +1,14 @@
+[package]
+
+name = "rust-omr"
+version = "0.0.1"
+authors = ["Andrew Wagner <drewm1980@gmail.com>"]
+
+[dependencies.png]
+git="https://github.com/servo/rust-png"
+
+[dependencies.stb-image]
+git="https://github.com/servo/rust-stb-image"
+
+[[bin]]
+name = "rust-omr"
