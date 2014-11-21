@@ -1,0 +1,8 @@
+The current version of this code is released into the Public Domain
+
+If it ever makes it past "throw-away-code" status,
+I will put more thought into the license and maybe
+start accepting pull requests.
+
+Cheers,
+Andrew

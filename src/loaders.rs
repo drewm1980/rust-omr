@@ -1,15 +1,26 @@
 extern crate png;
-use self::png::{load_png,Image};
+extern crate librust_omr;
 
-pub fn load(path: &Path) -> png::Image {
-		println!("Loading file {}...",path.display());
+pub fn load(path: &Path) -> librust_omr::Image {
+//pub fn load(path: &Path) -> png::Image {
+//pub fn load(path: &Path)  {
+		//println!("Loading file {}...",path.display());
 
-		let img = match load_png(path){
-			Ok(img) => img,
-			Err(e) => panic!("Could not open file at path: {}; load_path returned {}",path.display(),e)
-		};
-		println!("Image width is {}", img.width);
-		img
+        let img = match png::load_png(path){
+            Ok(img) => img,
+            Err(e) => panic!("Could not open file at path: {}; load_path returned {}",path.display(),e),
+        };
+        println!("Image width is {}", img.width);
+
+        // Get the data into our own data structure.
+        librust_omr::Image {
+            width: img.width,
+            height: img.height,
+            pixels: match img.pixels {
+                png::K8(buf) => buf.as_slice(),
+                _ => panic!("Image pixel type is unsupported!"),
+            },
+        }
 }
 
 #[cfg(test)]

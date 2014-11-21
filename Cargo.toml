@@ -1,14 +1,20 @@
 [package]
 
-name = "rust-omr"
+name = "rust_omr"
 version = "0.0.1"
 authors = ["Andrew Wagner <drewm1980@gmail.com>"]
 
-[dependencies.png]
-git="https://github.com/servo/rust-png"
+#[dependencies.png] # doesn't build
+#git="https://github.com/servo/rust-png"
 
-[dependencies.stb_image]
-git="https://github.com/servo/rust-stb-image"
+#[dependencies.stb_image] # doesn't build
+#git="https://github.com/servo/rust-stb-image"
+
+[lib]
+name = "librust_omr"
+path = "src/lib.rs"
 
 [[bin]]
-name = "rust-omr"
+name = "recognize"
+path = "src/main.rs"
+

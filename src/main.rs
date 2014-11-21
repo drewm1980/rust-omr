@@ -1,16 +1,11 @@
-#![crate_name = "rust-omr"]
-#![crate_type = "rlib"]
+//#![crate_name = "rust_omr"]
+//#![crate_type = "rlib"]
 
-//use std::mem;
-//use std::io;
-//use std::io::File;
-//use std::ptr;
-//use std::slice;
 use std::os;
-
 use std::io::fs::PathExtensions;
 
-mod loaders;
+mod lib;
+//mod loaders;
 //use loaders::load;
 
 #[allow(dead_code)]
@@ -29,5 +24,5 @@ fn main() {
     let loadpath = Path::new(path_to_load);
     if ! (loadpath.exists()) {panic!("The file {} does not exist!",path_to_load)}
 
-    loaders::load(&loadpath);
+    //loaders::load(&loadpath);
 }
