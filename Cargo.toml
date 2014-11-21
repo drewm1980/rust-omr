@@ -13,6 +13,7 @@ authors = ["Andrew Wagner <drewm1980@gmail.com>"]
 [lib]
 name = "librust_omr"
 path = "src/lib.rs"
+test = false
 
 [[bin]]
 name = "recognize"
