@@ -1,12 +1,13 @@
 //extern crate png;
 //extern crate librust_omr;
 
-use image;
+use image::{Image};
+use pgm;
 
 pub fn load(path: &Path) -> Image {
     match path.extension {
-        //some(str) if str=="png" => load_using_png(path),
-        some(str) if str=="pgm" => pgm::load(path),
+        //Some(str) if str=="png" => load_using_png(path),
+        Some(str) if str=="pgm" => pgm::load(path),
        None => load_using_magick(path),
     }
 }
@@ -22,7 +23,7 @@ fn load_using_magick(path: &Path) -> Image {
         .arg("-")
         .output() {
         Ok(output) => output,
-        Err(e) => fail!("Unable to run ImageMagick's convert tool in a separate process! convert returned: {}", e),
+        Err(e) => panic!("Unable to run ImageMagick's convert tool in a separate process! convert returned: {}", e),
     };
 
     //println!("status: {}", output.status);
@@ -62,6 +63,27 @@ mod test {
 #[test]
 	fn test_easyload() {
 		let loadfile = "sheet_music/La_yumba1.png";
+		let loadpath = &Path::new(loadfile);
+		super::load(loadpath);
+	}
+
+#[test]
+	fn test_load_png_from_file() {
+		let loadfile = "test_images/rust_favicon.png";
+		let loadpath = &Path::new(loadfile);
+		super::load(loadpath);
+	}
+
+#[test]
+	fn test_load_jpg_from_file() {
+		let loadfile = "test_images/rust_favicon.jpg";
+		let loadpath = &Path::new(loadfile);
+		super::load(loadpath);
+	}
+
+#[test]
+	fn test_load_gif_from_file() {
+		let loadfile = "test_images/rust_favicon.gif";
 		let loadpath = &Path::new(loadfile);
 		super::load(loadpath);
 	}

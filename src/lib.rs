@@ -2,11 +2,17 @@
 //#![crate_type = "rlib"]
 //! This module contains the API for a toy Optical Music Recognition System.
 
+
+#![allow(dead_code)]
+#![allow(unused_variables)]
+
 use std::default::Default;
 use std::fmt;
 
 use image::Image;
 mod image;
+mod loaders;
+mod pgm;
 //use image::Image;
 //use 
 

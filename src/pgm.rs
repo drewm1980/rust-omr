@@ -27,7 +27,7 @@ fn isdigit(c:u8) -> bool {
 }
 
 /// Load an image that is already known to be a pgm file
-pub fn load(path: &Path) -> Image {
+fn load(path: &Path) -> Image {
 
     use std::io::File;
     let contents = File::open(path).read_to_end();
@@ -35,18 +35,19 @@ pub fn load(path: &Path) -> Image {
     parse(contents)
 }
 
-pub fn parse(data) -> Image {
+/// Parse an in-memory pgm file
+fn parse(data:&[u8]) -> Image {
 
     // Scan a the magic word "P5"
-    let iter = contents.iter();
-    assert!(iter.next()=='P');
-    assert!(iter.next()=='5');
+    let iter = data.iter();
+    assert!(iter.next()==Some('P'));
+    assert!(iter.next()==Some('5'));
 
     let eat_at_least_some_whitespace = || {
         assert!(isspace(iter.next()));
         let mut c = iter.next();
         while isspace(c) { c = iter.next() }; 
-    }
+    };
 
     eat_at_least_some_whitespace();
 
@@ -59,7 +60,7 @@ pub fn parse(data) -> Image {
             c = iter.next();
         }
         s
-    }
+    };
 
     let width = read_a_digit();
     
@@ -70,19 +71,25 @@ pub fn parse(data) -> Image {
     eat_at_least_some_whitespace();
     
     let maxval = read_a_digit();
-    asserteq!(maxval,255);
+    assert_eq!(maxval,255);
 
     // There should be exactly one more whitespace character according to the spec.
     assert!(isspace(iter.next()));
 
-    let pixels = vec![_,..width*height];
+    let pixels:Vec<u8>;
+    pixels.set_capacity(width*height);
+    //let pixels = vec![_,..width*height];
 
     for p in pixels {
         pixels.push(
             match iter.next(){
-                Some(byte) => byte;
-                None => panic!("PGM image had too few pixels!")
+                Some(byte) => byte,
+                None => panic!("PGM image had too few pixels!"),
             });
+    }
+    match(iter.next()) {
+        Some(byte) => panic!("PGM image had too many pixels!"),
+        None => (),
     }
     
     // Get the data into our own data structure.
@@ -99,9 +106,10 @@ mod test {
 
 #[test]
 	fn test_load_pgm_from_file() {
-		let loadfile = "sheet_music/La_yumba1.png";
+		let loadfile = "test_images/rust_favicon.pgm";
 		let loadpath = &Path::new(loadfile);
 		super::load(loadpath);
 	}
+
 }
 
