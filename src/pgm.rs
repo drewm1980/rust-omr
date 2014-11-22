@@ -5,10 +5,11 @@
 
 //use librust_omr::Image;
 //mod lib;
-//use super::Image;
+use image::Image;
+use std::u32;
 
 fn isspace(c:u8) -> bool {
-    match c {'\x20'// space (SPC)
+    match c as char {'\x20'// space (SPC)
             |'\x09'	// horizontal tab (TAB)
             |'\x0a'	// newline (LF)
             |'\x0b'	// vertical tab (VT)
@@ -27,39 +28,51 @@ fn isdigit(c:u8) -> bool {
 }
 
 /// Load an image that is already known to be a pgm file
-fn load(path: &Path) -> Image {
+pub fn load(path: &Path) -> Image {
 
     use std::io::File;
-    let contents = File::open(path).read_to_end();
+    let contents = match File::open(path).read_to_end() {
+        Ok(c) => c,
+        Err(e) => panic!("Could not read to the end of the file!: {}",e),
+    };
 
-    parse(contents)
+    parse(contents.as_slice())
 }
 
 /// Parse an in-memory pgm file
-fn parse(data:&[u8]) -> Image {
+pub fn parse(data:&[u8]) -> Image {
 
     // Scan a the magic word "P5"
     let iter = data.iter();
-    assert!(iter.next()==Some('P'));
-    assert!(iter.next()==Some('5'));
+    let mut c:u8;
+
+    // Get the next c if there is one, or panic.
+    let nextc = || { c = *(iter.next().unwrap()); };
+
+    nextc();
+    assert!(c == 'P' as u8);
+    nextc();
+    assert!(c == '5' as u8);
 
     let eat_at_least_some_whitespace = || {
-        assert!(isspace(iter.next()));
-        let mut c = iter.next();
-        while isspace(c) { c = iter.next() }; 
+        nextc();
+        assert!(isspace(c));
+        while isspace(c) {nextc()}; 
     };
 
     eat_at_least_some_whitespace();
 
-    // Scan a digit representing the width
     let read_a_digit = || {
         assert!(isdigit(c));
         let s:String;
         while isdigit(c) {
-            s.push(c);
-            c = iter.next();
+            s.push(c as char);
+            nextc();
         }
-        s
+        match from_str::<u32>(s.as_slice()) {
+            Some(i) => i,
+            None => panic!("Could not convert string to int.  Corrupted pgm file?"),
+        }
     };
 
     let width = read_a_digit();
@@ -74,29 +87,21 @@ fn parse(data:&[u8]) -> Image {
     assert_eq!(maxval,255);
 
     // There should be exactly one more whitespace character according to the spec.
-    assert!(isspace(iter.next()));
+    nextc();
+    assert!(isspace(c));
 
-    let pixels:Vec<u8>;
-    pixels.set_capacity(width*height);
-    //let pixels = vec![_,..width*height];
+    let mut pixels:Vec<u8> = Vec::with_capacity((width*height) as uint);
 
-    for p in pixels {
-        pixels.push(
-            match iter.next(){
-                Some(byte) => byte,
-                None => panic!("PGM image had too few pixels!"),
-            });
+    for p in iter {
+        pixels.push(*p);
     }
-    match(iter.next()) {
-        Some(byte) => panic!("PGM image had too many pixels!"),
-        None => (),
-    }
+    assert!(pixels.len()==(width*height) as uint, "PGM image has wrong number of pixels according to the header!");
     
     // Get the data into our own data structure.
     Image {
         width: width,
         height: height,
-        pixels: pixels,
+        pixels: pixels.as_slice(),
     }
 }
 

@@ -3,11 +3,13 @@
 
 use image::{Image};
 use pgm;
+use std::str::{from_utf8};
 
 pub fn load(path: &Path) -> Image {
-    match path.extension {
+    //let ext = str::from_utf8(path.extension()).unwrap();
+    match path.extension() {
         //Some(str) if str=="png" => load_using_png(path),
-        Some(str) if str=="pgm" => pgm::load(path),
+        Some(s) if from_utf8(s).unwrap()=="pgm" => pgm::load(path),
        None => load_using_magick(path),
     }
 }
@@ -22,7 +24,7 @@ fn load_using_magick(path: &Path) -> Image {
         .arg(path)
         .arg("-")
         .output() {
-        Ok(output) => output,
+        Ok(o) => o,
         Err(e) => panic!("Unable to run ImageMagick's convert tool in a separate process! convert returned: {}", e),
     };
 
@@ -30,7 +32,7 @@ fn load_using_magick(path: &Path) -> Image {
     //println!("stdout: {}", String::from_utf8_lossy(output.output.as_slice()));
     //println!("stderr: {}", String::from_utf8_lossy(output.error.as_slice()));
 
-    pgm::parse(data)
+    pgm::parse(output.output.as_slice())
 
 }
 
