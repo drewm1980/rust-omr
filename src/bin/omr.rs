@@ -1,14 +1,15 @@
-//#![crate_name = "rust_omr"]
-//#![crate_type = "rlib"]
+#![allow(dead_code)]
+
+extern crate omr;
 
 use std::os;
 use std::io::fs::PathExtensions;
 
-mod lib;
+//mod lib;
 //mod loaders;
 //use loaders::load;
+//mod pgm;
 
-#[allow(dead_code)]
 fn main() {
     let args = os::args();
     println!("Entering main...");

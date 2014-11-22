@@ -11,11 +11,8 @@ authors = ["Andrew Wagner <drewm1980@gmail.com>"]
 #git="https://github.com/servo/rust-stb-image"
 
 [lib]
-name = "librust_omr"
+name = "omr"
 path = "src/lib.rs"
-test = false
+#test = false
 
-[[bin]]
-name = "recognize"
-path = "src/main.rs"
 

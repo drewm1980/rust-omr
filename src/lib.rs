@@ -5,6 +5,12 @@
 use std::default::Default;
 use std::fmt;
 
+use image::Image;
+mod image;
+//use image::Image;
+//use 
+
+
 //#[deriving(Default)] // Broken in rust nightly
 //#[deriving(Show)] // Also Broken in rust nightly
 struct Histogram {
@@ -33,22 +39,10 @@ impl fmt::Show for Histogram {
     }
 }
 
-/// An image data container used internally.
-/// Images are 8-bit single channel for now.
-pub struct Image<'a> {
-    /// Width of the image in pixels.
-    pub width: u32,
-    /// Height of the image in pixels.
-    pub height: u32,
-    /// The buffor containing the image data.
-    //pub pixels: Vec<u8>,
-    pub pixels: &'a [u8],
-}
-
 /// Single pass algorithm to compute the histogram of 
 /// the pixel colors in a grayscale 8 bit image,
 /// or other flat dense array of u8.
-fn histogram(im:Image) -> Histogram {
+fn histogram(im:image::Image) -> Histogram {
     let numpixels:u64 = (im.width as u64) * (im.height as u64);
     let needed_bin_capacity:u64 = 255*numpixels;
     //if needed_bin_capacity > 2**32-1

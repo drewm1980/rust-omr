@@ -1,27 +1,57 @@
-extern crate png;
-extern crate librust_omr;
+//extern crate png;
+//extern crate librust_omr;
 
-pub fn load(path: &Path) -> librust_omr::Image {
-//pub fn load(path: &Path) -> png::Image {
-//pub fn load(path: &Path)  {
-		//println!("Loading file {}...",path.display());
+use image;
 
-        let img = match png::load_png(path){
-            Ok(img) => img,
-            Err(e) => panic!("Could not open file at path: {}; load_path returned {}",path.display(),e),
-        };
-        println!("Image width is {}", img.width);
-
-        // Get the data into our own data structure.
-        librust_omr::Image {
-            width: img.width,
-            height: img.height,
-            pixels: match img.pixels {
-                png::K8(buf) => buf.as_slice(),
-                _ => panic!("Image pixel type is unsupported!"),
-            },
-        }
+pub fn load(path: &Path) -> Image {
+    match path.extension {
+        //some(str) if str=="png" => load_using_png(path),
+        some(str) if str=="pgm" => pgm::load(path),
+       None => load_using_magick(path),
+    }
 }
+
+// Load a file by first using imageMagick to convert it to a .pgm file.
+fn load_using_magick(path: &Path) -> Image {
+    use std::io::Command;
+
+    let output = match Command::new("convert")
+        .arg("-format pgm")
+        .arg("-depth 8")
+        .arg(path)
+        .arg("-")
+        .output() {
+        Ok(output) => output,
+        Err(e) => fail!("Unable to run ImageMagick's convert tool in a separate process! convert returned: {}", e),
+    };
+
+    //println!("status: {}", output.status);
+    //println!("stdout: {}", String::from_utf8_lossy(output.output.as_slice()));
+    //println!("stderr: {}", String::from_utf8_lossy(output.error.as_slice()));
+
+    pgm::parse(data)
+
+}
+
+//fn load_using_png(path: &Path) -> Image {
+    //use pgm;
+
+    //let img = match png::load_png(path){
+        //Ok(img) => img,
+        //Err(e) => panic!("Could not open file at path: {}; load_path returned {}",path.display(),e),
+    //};
+    //println!("Image width is {}", img.width);
+
+    //// Get the data into our own data structure.
+    //Image {
+        //width: img.width,
+        //height: img.height,
+        //pixels: match img.pixels {
+            //png::K8(buf) => buf.as_slice(),
+            //_ => panic!("Image pixel type is unsupported!"),
+        //},
+    //}
+//}
 
 #[cfg(test)]
 mod test {
@@ -35,22 +65,5 @@ mod test {
 		let loadpath = &Path::new(loadfile);
 		super::load(loadpath);
 	}
-
-//#[test]
-	//fn test_store() {
-		//let mut img = Image {
-//width: 10,
-	       //height: 10,
-	       //pixels: RGB8(Vec::from_elem(10 * 10 * 3, 100u8)),
-		//};
-		//let res = store_png(&mut img, &Path::new("test/store.png"));
-		//assert!(res.is_ok());
-	//}
-//#[test]
-	//fn test_load() 
-	//{
-		//load_rgba8("test/servo-screenshot.png", 831, 624);
-		//load_rgba8("test/store.png", 10, 10);
-	//}
 }
 
