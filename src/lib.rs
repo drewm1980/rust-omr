@@ -12,7 +12,7 @@ use std::fmt;
 use image::Image;
 mod image;
 mod loaders;
-mod pgm;
+//mod pgm;
 //use image::Image;
 //use 
 
