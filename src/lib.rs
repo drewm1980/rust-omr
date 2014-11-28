@@ -39,7 +39,10 @@ impl fmt::Show for Histogram {
         let s:String;
         let mut s = Vec::new();
         for p in self.bins.iter() {
-            write!(&mut s, "{}, ", p);
+            match write!(&mut s, "{}, ", p) {
+                Ok(_) => (),
+                Err(e) => panic!("Bug in histogram print code!{}",e)
+            }
         }
         write!(f, "Histogram({})", s)
     }
@@ -72,13 +75,12 @@ mod test {
 
 #[test]
     fn test_histogram_creation() {
-        let mut h:Histogram = Default::default();
-
+        let h:Histogram = Default::default();
     }
 
 #[test]
     fn test_histogram_print() {
-        let mut h:Histogram = Default::default();
+        let h:Histogram = Default::default();
         println!("Contents of the histogram: {}",h);
     }
 

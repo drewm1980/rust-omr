@@ -4,10 +4,9 @@
 ///  http://netpbm.sourceforge.net/doc/pgm.html
 
 use image::Image;
-use std::u32;
 
 /// Test if a char is (UNIX) whitespace.
-fn isspace(c:u8) -> bool {
+fn is_space(c:u8) -> bool {
     match c as char {'\x20'// space (SPC)
             |'\x09'	// horizontal tab (TAB)
             |'\x0a'	// newline (LF)
@@ -27,29 +26,16 @@ fn is_digit(c:u8) -> bool {
     }
 }
 
-///// Parse a single digit from the beginning of an ascii string,
-///// and return the rest of the string.
-//fn parse_digit(s:&[u8]) -> (u8, &[u8]) {
-    //assert!(s.len()>0);
-    //if is_digit(s[0]) 
-    //{
-        //(s[0],s.slice(1,s.len()-1))
-    //} else {
-        //panic!("Couldn't parse a digit from the front of the string!")
-    //}
-//}
-
 /// Parse an integer from the front of an ascii string,
 /// and return it along with the remainder of the string
 fn parse_int(s:&[u8]) -> (u32, &[u8]) {
-    use std::string;
     use std::str;
     assert!(s.len()>0);
     let mut n:Vec<u8> = vec![];
-    while (s.len()>0 && is_digit(s[0]))
+    while s.len()>0 && is_digit(s[0])
     {
         n.push(s[0]);
-        s = s.slice(1,s.len()-1);
+        let s = s.slice(1,s.len()-1);
     }
 
     let i:int = 0;
@@ -64,9 +50,9 @@ fn parse_int(s:&[u8]) -> (u32, &[u8]) {
 
 /// Remove all of the leading whitespace from a ascii string
 fn remove_leading_whitespace(s:&[u8]) -> &[u8] {
-    while(s.len()>0 && isspace(s[0]))
+    while s.len()>0 && is_space(s[0])
     {
-        s = s.slice(1,s.len()-1);
+        let s = s.slice(1,s.len()-1);
     }
     s
 }
@@ -84,31 +70,36 @@ pub fn load(path: &Path) -> Image {
 }
 
 /// Parse an in-memory pgm file
+#[allow(unreachable_code)]
 pub fn parse(s:&[u8]) -> Image {
     
     // Scan the magic word "P5"
     assert!(s.len()>2);
     assert!(s[0] == 'P' as u8);
     assert!(s[1] == '5' as u8);
-    s = s.slice(2,s.len());
+    let s = s.slice(2,s.len());
 
-    s = remove_leading_whitespace(s);
+    let s = remove_leading_whitespace(s);
+
+    panic!("HERE!!");
 
     let (width,height,maxval):(int,int,int);
     let (width,s) = parse_int(s.as_slice());
 
-    s = remove_leading_whitespace(s);
+    let s = remove_leading_whitespace(s);
 
     let (height,s) = parse_int(s.as_slice());
 
-    s = remove_leading_whitespace(s);
+    let s = remove_leading_whitespace(s);
     
     let (maxval,s) = parse_int(s.as_slice());
     assert_eq!(maxval,255);
 
     // Exactly one character of whitespace is obligatory
-    assert!(isspace(s[0]));
-    s = s.slice(1,s.len()); 
+    assert!(is_space(s[0]));
+    let s = s.slice(1,s.len()); 
+ 
+    println!("Parsed out width={}, hight={}, maxval={}",width,height,maxval);
     
     // What remains in our slice is the slice we care about
     let mut pixels:Vec<u8> = Vec::with_capacity((width*height) as uint);
@@ -118,12 +109,6 @@ pub fn parse(s:&[u8]) -> Image {
     }
     assert!(pixels.len()==(width*height) as uint, "PGM image has wrong number of pixels according to the header!");
     
-    // Get the data into our own data structure.
-    //Image {
-        //width: 10,
-        //height: 10,
-        //pixels: vec![1,2,3],
-    //}
     Image {
         width: width,
         height: height,
@@ -134,13 +119,35 @@ pub fn parse(s:&[u8]) -> Image {
 #[cfg(test)]
 mod test {
 	extern crate test;
+    use image::Image;
+    use super::{is_space,is_digit,parse};
 
 #[test]
-	fn test_load_pgm_from_file() {
-		let loadfile = "test_images/rust_favicon.pgm";
-		let loadpath = &Path::new(loadfile);
-		super::load(loadpath);
-	}
+    fn test_is_space() {
+        let s:&[u8] = b" 2";
+        assert!(is_space(s[0]));
+        assert!(!is_space(s[1]));
+    }
+
+#[test]
+    fn test_is_digit() {
+        let s:&[u8] = b"2";
+        assert!(is_number(s[1]));
+        assert!(!is_number(s[0]));
+    }
+
+#[test]
+    fn test_parse_trivial_inmemory() {
+        let s:&[u8] = b"P5 2 2 255 12345678";
+        let i:Image = parse(s);
+    }
+
+//#[test]
+	//fn test_load_pgm_from_file() {
+		//let loadfile = "test_images/rust_favicon.pgm";
+		//let loadpath = &Path::new(loadfile);
+		//super::load(loadpath);
+	//}
 
 }
 
