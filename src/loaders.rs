@@ -36,7 +36,7 @@ fn load_using_magick(path: &Path) -> Image {
         true => output_unwrapped.output,
     };
 
-    pgm::parse(data)
+    pgm::parse(data.as_slice())
 
 }
 

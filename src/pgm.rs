@@ -42,6 +42,8 @@ fn is_digit(c:u8) -> bool {
 /// Parse an integer from the front of an ascii string,
 /// and return it along with the remainder of the string
 fn parse_int(s:&[u8]) -> (u32, &[u8]) {
+    use std::string;
+    use std::str;
     assert!(s.len()>0);
     let mut n:Vec<u8> = vec![];
     while (s.len()>0 && is_digit(s[0]))
@@ -54,7 +56,7 @@ fn parse_int(s:&[u8]) -> (u32, &[u8]) {
     for i in range(0,s.len()){
     }
 
-    match from_str::<u32>(s) {
+    match from_str::<u32>(str::from_utf8(s).unwrap()) {
         Some(i) => (i,s),
         None => panic!("Could not convert string to int.  Corrupted pgm file?"),
     }
@@ -92,18 +94,19 @@ pub fn parse(s:&[u8]) -> Image {
 
     s = remove_leading_whitespace(s);
 
-    let (width:int,s) = parse_int(data.as_slice());
+    let (width,height,maxval):(int,int,int);
+    let (width,s) = parse_int(s.as_slice());
 
     s = remove_leading_whitespace(s);
 
-    let (height:int,s) = parse_int(data.as_slice());
+    let (height,s) = parse_int(s.as_slice());
 
     s = remove_leading_whitespace(s);
     
-    let (maxval:int,s) = parse_int(data.as_slice());
+    let (maxval,s) = parse_int(s.as_slice());
     assert_eq!(maxval,255);
 
-    // One character of whitespace is obligatory
+    // Exactly one character of whitespace is obligatory
     assert!(isspace(s[0]));
     s = s.slice(1,s.len()); 
     
