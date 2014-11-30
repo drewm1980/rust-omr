@@ -132,8 +132,8 @@ mod test {
 #[test]
     fn test_is_digit() {
         let s:&[u8] = b"2";
-        assert!(is_number(s[1]));
-        assert!(!is_number(s[0]));
+        assert!(is_digit(s[1]));
+        assert!(!is_digit(s[0]));
     }
 
 #[test]
