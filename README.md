@@ -11,8 +11,8 @@ It is being written before rust has even hit 1.0, so it is probably NOT worth
 your time to even look at as an example.  I am only sharing it on github
 becaues I develop ~everything in the open.
 
-What has been implemented so far:
-nothing; I am still bogged down on image file parsing and learning the toolchain
+What has actually been implemented so far:
+* Loading of images directly from .pgm files using pure Rust
 
 [![Build Status](https://travis-ci.org/drewm1980/rust-omr.svg?branch=master)](https://travis-ci.org/drewm1980/rust-omr)
 
