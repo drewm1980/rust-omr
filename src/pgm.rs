@@ -22,15 +22,7 @@ fn is_space(c:u8) -> bool {
 
 /// Test if a char is an ASCII digit
 fn is_digit(c:u8) -> bool {
-    //match c {
-        //30|31|32|33|34|35|36|37|38|39 => true,
-        //_ => false
-    //}
     c>=0x29 && c<0x40
-    //match c {
-        //30|31|32|33|34|35|36|37|38|39 => true,
-        //_ => false
-    //}
 }
 
 /// Parse an integer from the front of an ascii string,
@@ -79,36 +71,35 @@ pub fn load(path: &Path) -> Image {
 
 /// Parse an in-memory pgm file
 #[allow(unreachable_code)]
-pub fn parse(s:&[u8]) -> Image {
-    
+pub fn parse(im:&[u8]) -> Image {
+
+    let mut s = im; // Slice that we will mutate as we scan through
+                    // the file
+
     // Scan the magic word "P5"
     assert!(s.len()>2);
     assert!(s[0] == 'P' as u8);
     assert!(s[1] == '5' as u8);
-    let s = s.slice(2,s.len());
+    s = s.slice_from(2);
 
-/*
-    let s = remove_leading_whitespace(s);
+    s = remove_leading_whitespace(s);
 
-    panic!("HERE!!");
+    let (width, mut s) = parse_int(s);
 
-    let (width,height,maxval):(int,int,int);
-    let (width,s) = parse_int(s.as_slice());
+    s = remove_leading_whitespace(s);
 
-    let s = remove_leading_whitespace(s);
+    let (height,mut s) = parse_int(s);
 
-    let (height,s) = parse_int(s.as_slice());
-
-    let s = remove_leading_whitespace(s);
+    s = remove_leading_whitespace(s);
     
-    let (maxval,s) = parse_int(s.as_slice());
+    let (maxval,mut s) = parse_int(s);
     assert_eq!(maxval,255);
 
     // Exactly one character of whitespace is obligatory
     assert!(is_space(s[0]));
-    let s = s.slice(1,s.len()); 
+    s = s.slice_from(1); 
  
-    println!("Parsed out width={}, hight={}, maxval={}",width,height,maxval);
+    //println!("Parsed out width={}, height={}, maxval={}",width,height,maxval);
     
     // What remains in our slice is the slice we care about
     let mut pixels:Vec<u8> = Vec::with_capacity((width*height) as uint);
@@ -117,13 +108,7 @@ pub fn parse(s:&[u8]) -> Image {
         pixels.push(p);
     }
     assert!(pixels.len()==(width*height) as uint, "PGM image has wrong number of pixels according to the header!");
-    */
     
-    //Image {width::2,height:2,pixels:b"1234"}
-    let width = 2;
-    let height = 2;
-    let pixels:Vec<u8> = vec![1,2,3,4];
-
     Image {
         width: width,
         height: height,
@@ -201,21 +186,22 @@ mod test {
         assert!(c==b);
     }
 
+#[test]
+    fn test_parse_trivial_inmemory() {
+        let s:&[u8] = b"P5 2 5 255 1234567890";
+        let i:Image = super::parse(s);
+        assert!(i.width == 2);
+        assert!(i.height == 5);
+        assert!(i.pixels[0] == b"1"[0]);
+        assert!(i.pixels.len() == 10);
+    }
 
-
-//#[test]
-    //use super::parse;
-    //fn test_parse_trivial_inmemory() {
-        //let s:&[u8] = b"P5 2 2 255 12345678";
-        //let i:Image = parse(s);
-    //}
-
-//#[test]
-	//fn test_load_pgm_from_file() {
-		//let loadfile = "test_images/rust_favicon.pgm";
-		//let loadpath = &Path::new(loadfile);
-		//super::load(loadpath);
-	//}
+#[test]
+    fn test_load_pgm_from_file() {
+        let loadfile = "test_images/rust_favicon.pgm";
+        let loadpath = &Path::new(loadfile);
+        super::load(loadpath);
+    }
 
 }
 
