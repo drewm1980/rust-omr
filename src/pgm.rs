@@ -55,14 +55,15 @@ fn parse_int(s:&[u8]) -> (u32, &[u8]) {
     }
 }
 
-///// Remove all of the leading whitespace from a ascii string
-//fn remove_leading_whitespace(s:&[u8]) -> &[u8] {
-    //while s.len()>0 && is_space(s[0])
-    //{
-        //let s = s.slice(1,s.len()-1);
-    //}
-    //s
-//}
+/// Remove all of the leading whitespace from a ascii string
+fn remove_leading_whitespace(s:&[u8]) -> &[u8] {
+    let mut newslice = s;
+    while newslice.len()>0 && is_space(newslice[0])
+    {
+        newslice = newslice.slice_from(1);
+    }
+    newslice 
+}
 
 /// Load an image that is already known to be a pgm file
 pub fn load(path: &Path) -> Image {
@@ -174,6 +175,32 @@ mod test {
         assert!(newslice.len()==5);
         assert!(newslice[0]==b' ');
     }
+#[test]
+    fn test_string_comparison_sanity() {
+        let a:&[u8] = b"   hello";
+        let b:&[u8] = b"hello";
+        assert!(b"foo"==b"foo"); 
+        assert!(b"bar"!=b"foo");
+    }
+
+#[test]
+    fn test_remove_leading_whitespace_nomolest() {
+        use super::remove_leading_whitespace;
+        let b:&[u8] = b"hello";
+        assert!(remove_leading_whitespace(b)==b);
+    }
+
+#[test]
+    fn test_remove_leading_whitespace() {
+        use super::remove_leading_whitespace;
+        let a:&[u8] = b"   hello";
+        let b:&[u8] = b"hello";
+        let c:&[u8] = remove_leading_whitespace(a);
+        assert!(b.len()==5);
+        assert!(c.len()==5);
+        assert!(c==b);
+    }
+
 
 
 //#[test]
