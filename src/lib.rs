@@ -6,6 +6,8 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
+#![feature(slicing_syntax)]
+
 use std::default::Default;
 use std::fmt;
 

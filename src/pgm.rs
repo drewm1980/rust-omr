@@ -22,10 +22,15 @@ fn is_space(c:u8) -> bool {
 
 /// Test if a char is an ASCII digit
 fn is_digit(c:u8) -> bool {
-    match c {
-        30|31|32|33|34|35|36|37|38|39 => true,
-        _ => false
-    }
+    //match c {
+        //30|31|32|33|34|35|36|37|38|39 => true,
+        //_ => false
+    //}
+    c>=0x29 && c<0x40
+    //match c {
+        //30|31|32|33|34|35|36|37|38|39 => true,
+        //_ => false
+    //}
 }
 
 /// Parse an integer from the front of an ascii string,
@@ -33,19 +38,19 @@ fn is_digit(c:u8) -> bool {
 fn parse_int(s:&[u8]) -> (u32, &[u8]) {
     use std::str;
     assert!(s.len()>0);
+    let mut newslice = s; // bytecopy of the fat pointer?
     let mut n:Vec<u8> = vec![];
-    while s.len()>0 && is_digit(s[0])
+
+    // Pull the leading digits into a separate array
+    while newslice.len()>0 && is_digit(newslice[0])
     {
-        n.push(s[0]);
-        let s = s.slice(1,s.len()-1);
+        n.push(newslice[0]);
+        newslice = newslice.slice_from(1);
+        //newslice = newslice[1..];
     }
 
-    let i:int = 0;
-    for i in range(0,s.len()){
-    }
-
-    match from_str::<u32>(str::from_utf8(s).unwrap()) {
-        Some(i) => (i,s),
+    match from_str::<u32>(str::from_utf8(n.as_slice()).unwrap()) {
+        Some(i) => (i,newslice),
         None => panic!("Could not convert string to int.  Corrupted pgm file?"),
     }
 }
@@ -139,36 +144,37 @@ mod test {
 
 #[test]
     fn test_is_digit() {
-        let s:&[u8] = b"2 ";
-        assert!(super::is_digit(s[1]));
-        assert!(!super::is_digit(s[0]));
+        let s:&[u8] = b"0123456789";
+        for &c in s.iter() {
+            assert!(super::is_digit(c));
+        }
+
+        let s2:&[u8] = b"abcdefghijklmnopqsttuvwxyz";
+        for &c in s2.iter() {
+            assert!(!super::is_digit(c));
+        }
     }
 
 #[test]
     fn test_parse_int() {
-        let s:&[u8] = b"12345";
-        assert!(s.len()==5);
+        let s:&[u8] = b"012345";
+        assert!(s.len()==6);
         let (i,newslice) = super::parse_int(s);
         assert!(i==12345);
+        println!("length of returned slice: {}",newslice.len());
         assert!(newslice.len()==0);
     }
 
-    //fn test_parse_int() {
-        //let s:&[u8] = b"12345 ";
-        //assert!(s.len()==6);
-        //let i,newslice = super::parse_int(s);
-        //assert!(i==12345);
-        //assert!(newslice.len()==1);
-        //assert!(newslice[0]==' ');
-    //}
+#[test]
+    fn test_parse_int_with_trailing() {
+        let s:&[u8] = b"102345 abcd";
+        assert!(s.len()==11);
+        let (i,newslice) = super::parse_int(s);
+        assert!(i==102345);
+        assert!(newslice.len()==5);
+        assert!(newslice[0]==b' ');
+    }
 
-    //fn test_parse_int() {
-        //let s:&[u8] = b"12345 ";
-        //assert!(s.len()==6);
-        //let i,newslice = super::parse_int(s);
-        //assert!(i==12345);
-        //assert!(s.len()==1);
-    //}
 
 //#[test]
     //use super::parse;
