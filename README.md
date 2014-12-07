@@ -13,6 +13,7 @@ becaues I develop ~everything in the open.
 
 What has actually been implemented so far:
 * Loading of images directly from .pgm files using pure Rust
+* Loading anything image magick can load, provided it is installed
 
 [![Build Status](https://travis-ci.org/drewm1980/rust-omr.svg?branch=master)](https://travis-ci.org/drewm1980/rust-omr)
 
