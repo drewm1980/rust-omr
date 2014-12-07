@@ -1,26 +1,28 @@
-# Rust Optical Music Recognition System
+# [Optical Music Recognition System](http://en.wikipedia.org/wiki/Music_OCR) in Rust
 
-Given an image of some typeset sheet music, extract a semantic representation of it.
+:construction: :construction: :construction: :construction: :construction: :construction:
 
-Input format: 8-bit grayscale raster image in a format ImageMagck can read.
-Output format: To be determined.  Music XML?  Cleaned up SVG?
+Given an image of some typeset sheet music, extract a semantic representation of it:
+* Input format: 8-bit grayscale raster image in a format ImageMagck can read.
+* Output format: To be determined.  Music XML?  Cleaned up SVG?
 
 Goals for the code:
 * Fast
 * Minimal Dependencies
-* Usable as a command-line tool
-* Make the poor quality scans of sheet music on [todotango](http://www.todotango.com) print decently on my girlfriend's poor quality printer.
-* Maybe someday do automatic transcription to alternative music notations
+* Perfect performance on a well defined subset of [LilyPond](lilypond.org) output
 
 Personal Goals:
 * Learn [Rust](http://rust-lang.org)
-* Maintain my Computer Vision chops
+* Maintain some of my Computer Vision chops
+* Make the poor quality scans of sheet music on [todotango](http://www.todotango.com) at least print decently on my girlfriend's poor quality printer
+* Maybe someday do automatic transcription to alternative music notations
+
+Non-Goals at this time:
+* Supporting handwritten music
+* Ports to Mac, Windows
 
 ### Disclaimer
-This is some throw-away code that I am hacking on as a way to learn rust.  
-It is being written before rust has even hit 1.0, so it is probably NOT worth
-your time to even look at as an example.  I am only sharing it on github
-becaues I develop ~everything in the open.
+This code is being developed as a hobby, in a language that I am still learning, and which has not even hit 1.0. I am only sharing it on github because I develop ~everything in the open.  I have no expectaton that it will be useful any time soon, and you shouldn't either.  Run at your own risk!
 
 ### Status
 This is what I have actually implemented so far:
