@@ -1,17 +1,12 @@
-//extern crate png;
-
 use pgm;
 use image::{Image};
 use std::str::{from_utf8};
-use std::io::{IoResult,};
-use std::io::process::{ProcessOutput,};
 
+/// Load an image file using ImageMagick in a separate process,
+/// with automatic fallback (and fast case) to a native pgm file loader.
 pub fn load(path: &Path) -> Image {
-    //let ext = str::from_utf8(path.extension()).unwrap();
     match path.extension() {
         Some(s) if from_utf8(s).unwrap()=="pgm" => pgm::load(path),
-        //Some(str) if str=="png" => load_using_png(path),
-        None => load_using_magick(path),
         _ => load_using_magick(path),
     }
 }
@@ -19,59 +14,25 @@ pub fn load(path: &Path) -> Image {
 // Load a file by first using imageMagick to convert it to a .pgm file.
 fn load_using_magick(path: &Path) -> Image {
     use std::io::Command;
+    use std::io::process::ProcessExit::{ExitStatus,ExitSignal};
 
-    let output:IoResult<ProcessOutput> = Command::new("convert")
-        .arg("-format pgm")
-        .arg("-depth 8")
+    let output = Command::new("convert")
         .arg(path)
-        .arg("-")
-        .output();
-    let output_unwrapped:ProcessOutput = match output {
-        Ok(o) => o,
-        Err(e) => panic!("Unable to run ImageMagick's convert tool in a separate process! convert returned: {}", e),
-    };
-
-    let data: Vec<u8> = match output_unwrapped.status.success() {
-        false => panic!("signal or wrong error code from sub-process?"),
-        true => output_unwrapped.output,
+        .arg("pgm:-") // Dark imagemagick magick to force output of specific image type to stdout
+        .output().ok().unwrap();
+    
+    let data: Vec<u8> = match output.status {
+        ExitStatus(i) if i==0 => output.output,
+        ExitStatus(i) => panic!("Image Magick reported an error: {}",String::from_utf8_lossy(output.error.as_slice())),
+        ExitSignal(i) => panic!("Convert subprocess threw a signal {}",i),
     };
 
     pgm::parse(data.as_slice())
-
 }
-
-//fn load_using_png(path: &Path) -> Image {
-    //use pgm;
-
-    //let img = match png::load_png(path){
-        //Ok(img) => img,
-        //Err(e) => panic!("Could not open file at path: {}; load_path returned {}",path.display(),e),
-    //};
-    //println!("Image width is {}", img.width);
-
-    //// Get the data into our own data structure.
-    //Image {
-        //width: img.width,
-        //height: img.height,
-        //pixels: match img.pixels {
-            //png::K8(buf) => buf.as_slice(),
-            //_ => panic!("Image pixel type is unsupported!"),
-        //},
-    //}
-//}
 
 #[cfg(test)]
 mod test {
 	extern crate test;
-	//extern crate png;
-	//use self::png::{load_png,Image};
-
-#[test]
-	fn test_easyload() {
-		let loadfile = "sheet_music/La_yumba1.png";
-		let loadpath = Path::new(loadfile);
-		super::load(&loadpath);
-	}
 
 #[test]
 	fn test_load_png_from_file() {
@@ -93,5 +54,13 @@ mod test {
 		let loadpath = Path::new(loadfile);
 		super::load(&loadpath);
 	}
+
+#[test]
+	fn test_load_non_toy_image() {
+		let loadfile = "sheet_music/La_yumba1.gif";
+		let loadpath = Path::new(loadfile);
+		super::load(&loadpath);
+	}
+
 }
 

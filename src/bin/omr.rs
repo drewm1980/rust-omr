@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-extern crate omr;
+//extern crate omr;
 
 use std::os;
 use std::io::fs::PathExtensions;
