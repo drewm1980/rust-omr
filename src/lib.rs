@@ -15,6 +15,7 @@ use image::Image;
 mod image;
 mod loaders;
 mod pgm;
+mod geometry;
 //use image::Image;
 //use 
 
